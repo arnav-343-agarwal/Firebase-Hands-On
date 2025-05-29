@@ -2,10 +2,10 @@ import { useState } from 'react';
 import './App.css'
 import app from './firebase'
 import { getAuth } from 'firebase/auth';
-import {createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut} from 'firebase/auth'
+import {createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,signInWithPopup ,GoogleAuthProvider} from 'firebase/auth'
 
 const auth = getAuth(app);
-
+const provider = new GoogleAuthProvider();
 
 function App() {
   const [email,setEmail] = useState("")
@@ -37,6 +37,15 @@ function App() {
     setUser(null);
     alert("Logged out!");
   };
+
+  const signInWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      setUser(result.user);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   
   return (
     <div style={{ padding: 20 }}>
@@ -59,6 +68,18 @@ function App() {
       <button onClick={logout}>Logout</button>
 
       <h3>{user ? `Logged in as: ${user.email}` : "Not logged in"}</h3>
+
+      <h1>🔥 Firebase Google Auth</h1>
+      {user ? (
+        <>
+          <h3>Welcome, {user.displayName}</h3>
+          <img src={user.photoURL} alt="Profile" style={{ width: 60, borderRadius: "50%" }} />
+          <br /><br />
+          <button onClick={logOut}>Logout</button>
+        </>
+      ) : (
+        <button onClick={signInWithGoogle}>Sign in with Google</button>
+      )}
     </div>
   )
 }
